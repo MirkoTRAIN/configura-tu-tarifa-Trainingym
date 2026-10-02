@@ -1,0 +1,623 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#0E1116">
+<title>Precios Trainingym · Descubre tu tarifa</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Familjen+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --orange: #FF5A1F; --orange-pressed: #E04A12;
+    --noche: #0E1116; --superficie: #1B2029; --superficie-2: #242B35;
+    --texto-claro: #FCFCFD; --texto-claro-sec: #9BA3AE;
+    --ok: #3BB273; --bad: #FF6B6B;
+    --radius-lg: 14px; --radius-md: 10px; --radius-pill: 100px;
+    --font-display: 'Familjen Grotesk', system-ui, sans-serif;
+    --font-body: 'Inter', system-ui, sans-serif;
+    --navh: 0px;
+  }
+  * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  html, body { margin: 0; padding: 0; overflow-x: hidden; }
+  body { font-family: var(--font-display); background: var(--noche); color: var(--texto-claro); line-height: 1.5; -webkit-font-smoothing: antialiased; min-height: 100vh; min-height: 100dvh; -webkit-text-size-adjust: 100%; }
+  button { font-family: inherit; }
+
+  .topbar { padding: .6rem 1.5rem; padding-top: max(.6rem, env(safe-area-inset-top)); display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid rgba(255,255,255,.05); }
+  .topbar img { height: 40px; width: auto; display: block; }
+  .topbar-tag { font-size: 12px; color: var(--texto-claro-sec); font-weight: 500; }
+
+  /* ─── Formulario ─── */
+  #form-view { max-width: 760px; margin: 0 auto; padding: 3rem 1.5rem 4rem; }
+  .hero { transition: opacity .2s; }
+  .kicker { display: inline-flex; align-items: center; gap: 8px; font-size: 12px; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; color: var(--orange); }
+  .kicker::before { content: ''; width: 18px; height: 2px; background: var(--orange); border-radius: 2px; }
+  h1 { font-size: clamp(28px, 5vw, 46px); line-height: 1.06; letter-spacing: -.02em; margin: .6rem 0 .8rem; font-weight: 700; }
+  h1 em { font-style: normal; color: var(--orange); }
+  .lead { font-family: var(--font-body); color: var(--texto-claro-sec); font-size: 16px; max-width: 560px; margin: 0 0 2rem; }
+
+  .qcard { background: var(--superficie); border: 1px solid rgba(255,255,255,.06); border-radius: var(--radius-lg); padding: 1.6rem 1.6rem 1.4rem; box-shadow: 0 30px 60px rgba(0,0,0,.35); }
+  .progress { display: flex; align-items: center; gap: .8rem; margin-bottom: 1.4rem; }
+  .pbar { flex: 1; height: 4px; background: rgba(255,255,255,.08); border-radius: 4px; overflow: hidden; }
+  .pbar span { display: block; height: 100%; width: 0; background: var(--orange); border-radius: 4px; transition: width .35s ease; }
+  .pnum { font-family: var(--font-body); font-size: 12px; color: var(--texto-claro-sec); white-space: nowrap; font-variant-numeric: tabular-nums; }
+
+  .step { display: none; animation: stepIn .3s ease; }
+  .step.on { display: block; }
+  @keyframes stepIn { from { opacity: 0; transform: translateX(14px); } to { opacity: 1; transform: none; } }
+  .qlabel { font-size: clamp(21px, 3vw, 27px); font-weight: 700; letter-spacing: -.01em; margin: 0 0 .35rem; line-height: 1.2; }
+  .qlabel .req { color: var(--orange); }
+  .qhint { font-family: var(--font-body); font-size: 14px; color: var(--texto-claro-sec); margin: 0 0 1.1rem; }
+  .qhint b { color: var(--texto-claro); }
+  .inp { width: 100%; font-family: var(--font-body); font-size: 18px; color: var(--texto-claro); background: var(--superficie-2); border: 1.5px solid rgba(255,255,255,.08); border-radius: var(--radius-md); padding: .85rem 1rem; outline: none; transition: border-color .15s; -webkit-appearance: none; appearance: none; }
+  .inp:focus { border-color: var(--orange); }
+  .inp.err { border-color: var(--bad); }
+  textarea.inp { min-height: 110px; resize: vertical; }
+  .errmsg { font-family: var(--font-body); color: var(--bad); font-size: 13.5px; margin-top: .5rem; min-height: 1em; }
+
+  .phone-row { display: grid; grid-template-columns: 210px 1fr; gap: .6rem; }
+  select.inp { cursor: pointer; background-image: linear-gradient(45deg, transparent 50%, #9BA3AE 50%), linear-gradient(135deg, #9BA3AE 50%, transparent 50%); background-position: calc(100% - 18px) 50%, calc(100% - 13px) 50%; background-size: 5px 5px; background-repeat: no-repeat; padding-right: 2.2rem; }
+  select.inp option { color: #1D1D1B; }
+  #otro-pref-wrap { display: none; margin-top: .6rem; }
+
+  .choices { display: grid; grid-template-columns: 1fr 1fr; gap: .55rem; }
+  .choice { font-family: var(--font-body); text-align: left; font-size: 15px; color: var(--texto-claro); background: var(--superficie-2); border: 1.5px solid rgba(255,255,255,.08); border-radius: var(--radius-md); padding: .8rem 1rem; cursor: pointer; display: flex; align-items: center; gap: .7rem; transition: border-color .12s, background .12s; min-height: 52px; }
+  .choice:hover { border-color: rgba(255,90,31,.6); }
+  .choice.on { border-color: var(--orange); background: rgba(255,90,31,.12); }
+  .choice .key { flex-shrink: 0; width: 24px; height: 24px; border-radius: 6px; border: 1px solid rgba(255,255,255,.18); display: inline-flex; align-items: center; justify-content: center; font-size: 11.5px; font-weight: 700; color: var(--texto-claro-sec); }
+  .choice.on .key { background: var(--orange); border-color: var(--orange); color: #fff; }
+
+  /* Producto */
+  .products { display: grid; grid-template-columns: repeat(3, 1fr); gap: .7rem; }
+  .product { text-align: left; background: var(--superficie-2); border: 1.5px solid rgba(255,255,255,.08); border-radius: var(--radius-lg); padding: 1.1rem 1rem 1rem; cursor: pointer; color: var(--texto-claro); display: flex; flex-direction: column; gap: .45rem; transition: border-color .12s, background .12s, transform .12s; position: relative; }
+  .product:hover { border-color: rgba(255,90,31,.6); transform: translateY(-2px); }
+  .product.on { border-color: var(--orange); background: rgba(255,90,31,.12); }
+  .product .p-ico { width: 42px; height: 42px; border-radius: 12px; background: rgba(255,90,31,.14); color: var(--orange); display: flex; align-items: center; justify-content: center; }
+  .product .p-ico svg { width: 24px; height: 24px; }
+  .product .p-name { font-size: 18px; font-weight: 700; line-height: 1.15; }
+  .product .p-desc { font-family: var(--font-body); font-size: 13px; color: var(--texto-claro-sec); line-height: 1.45; }
+  .product .p-cta { margin-top: auto; align-self: flex-start; font-size: 13.5px; font-weight: 700; color: #fff; background: var(--orange); border-radius: var(--radius-pill); padding: .5rem 1rem; transition: background .15s; white-space: nowrap; }
+  .product:hover .p-cta { background: var(--orange-pressed); }
+  .product.on .p-cta { background: var(--ok); }
+  .product.on .p-cta::before { content: '✓ '; }
+  .products:not(.chosen) .product { animation: prodPulse 2.4s ease-in-out infinite; }
+  .products:not(.chosen) .product:nth-child(2) { animation-delay: .25s; }
+  .products:not(.chosen) .product:nth-child(3) { animation-delay: .5s; }
+  @keyframes prodPulse { 0%, 100% { border-color: rgba(255,255,255,.08); box-shadow: none; } 50% { border-color: rgba(255,90,31,.75); box-shadow: 0 0 0 4px rgba(255,90,31,.12); } }
+  .start-chip { display: inline-flex; align-items: center; gap: 8px; font-family: var(--font-body); font-size: 12.5px; font-weight: 700; color: #fff; background: var(--orange); border-radius: var(--radius-pill); padding: .35rem .85rem; margin-bottom: .8rem; letter-spacing: .02em; }
+  .start-dot { width: 8px; height: 8px; border-radius: 50%; background: #fff; animation: dotPulse 1.4s ease-in-out infinite; }
+  @keyframes dotPulse { 0%, 100% { opacity: 1; transform: scale(1); } 50% { opacity: .35; transform: scale(.7); } }
+  .step[data-field="producto"] .qlabel { font-size: clamp(24px, 3.4vw, 31px); }
+
+  .notice { display: none; margin-top: 1rem; font-family: var(--font-body); font-size: 14px; line-height: 1.55; background: rgba(255,90,31,.1); border: 1px solid rgba(255,90,31,.35); border-left: 3px solid var(--orange); border-radius: var(--radius-md); padding: .85rem 1rem; color: var(--texto-claro); }
+  .notice.on { display: block; }
+  .notice b { color: var(--orange); }
+
+  .nav { display: flex; align-items: center; justify-content: space-between; gap: .8rem; margin-top: 1.5rem; }
+  .btn { font-size: 15px; font-weight: 700; border-radius: var(--radius-pill); padding: .8rem 1.5rem; cursor: pointer; border: 0; transition: background .15s, color .15s; display: inline-flex; align-items: center; justify-content: center; gap: .5rem; min-height: 48px; }
+  .btn-primary { background: var(--orange); color: #fff; }
+  .btn-primary:hover { background: var(--orange-pressed); }
+  .btn-primary:disabled { opacity: .55; cursor: wait; }
+  .btn-ghost { background: transparent; color: var(--texto-claro-sec); padding-left: .2rem; }
+  .btn-ghost:hover { color: var(--texto-claro); }
+  .enter-hint { font-family: var(--font-body); font-size: 12px; color: var(--texto-claro-sec); }
+  .enter-hint kbd { font-family: inherit; border: 1px solid rgba(255,255,255,.2); border-radius: 4px; padding: 0 5px; }
+
+  /* Confirmación */
+  .dest-box { display: flex; align-items: center; gap: 1rem; flex-wrap: wrap; background: var(--superficie-2); border: 1px solid rgba(255,255,255,.08); border-radius: var(--radius-lg); padding: 1rem 1.1rem; }
+  .dest-box img { width: 44px; height: 30px; object-fit: cover; border-radius: 4px; box-shadow: 0 2px 6px rgba(0,0,0,.3); }
+  .dest-name { font-size: 22px; font-weight: 700; line-height: 1.1; }
+  .dest-sub { font-family: var(--font-body); font-size: 13px; color: var(--texto-claro-sec); }
+  .country-change { margin-left: auto; display: flex; align-items: center; gap: .5rem; font-family: var(--font-body); font-size: 13px; color: var(--texto-claro-sec); }
+  .country-change select { font-size: 16px; padding: .5rem 2.2rem .5rem .9rem; border-radius: var(--radius-pill); background-color: var(--superficie); width: auto; }
+  .summary { margin-top: 1rem; display: grid; grid-template-columns: 1fr 1fr; gap: .35rem 1rem; font-family: var(--font-body); font-size: 13px; color: var(--texto-claro-sec); }
+  .summary span { overflow-wrap: anywhere; }
+  .summary b { color: var(--texto-claro); font-weight: 600; }
+  .submit-err { display: none; margin-top: 1rem; font-family: var(--font-body); font-size: 14px; color: var(--bad); }
+  .submit-err a { display: inline-block; padding: .2rem 0; }
+  .consent { display: flex; align-items: flex-start; gap: .75rem; margin-top: 1.2rem; padding: .9rem 1rem; background: var(--superficie-2); border: 1.5px solid rgba(255,255,255,.1); border-radius: var(--radius-md); cursor: pointer; font-family: var(--font-body); font-size: 14px; line-height: 1.5; color: var(--texto-claro); transition: border-color .15s; }
+  .consent:hover { border-color: rgba(255,90,31,.6); }
+  .consent input { position: absolute; opacity: 0; width: 1px; height: 1px; }
+  .consent-box { flex-shrink: 0; width: 22px; height: 22px; margin-top: 1px; border-radius: 6px; border: 2px solid rgba(255,255,255,.35); display: inline-flex; align-items: center; justify-content: center; transition: all .15s; }
+  .consent input:checked + .consent-box { background: var(--orange); border-color: var(--orange); }
+  .consent input:checked + .consent-box::after { content: ''; width: 6px; height: 11px; border: solid #fff; border-width: 0 2.5px 2.5px 0; transform: rotate(45deg) translate(-1px, -1px); }
+  .consent input:focus-visible + .consent-box { box-shadow: 0 0 0 3px rgba(255,90,31,.35); }
+  .consent:has(input:checked) { border-color: var(--orange); }
+  .consent a { color: var(--orange); font-weight: 600; text-decoration: underline; text-underline-offset: 2px; }
+  .consent-note { font-family: var(--font-body); font-size: 12px; color: var(--texto-claro-sec); margin: .6rem 0 0; line-height: 1.45; }
+
+  /* ─── Vista de precios ─── */
+  #result-view { display: none; }
+  .wbar { display: flex; align-items: center; gap: .6rem .8rem; flex-wrap: wrap; padding: .65rem 1.5rem; background: var(--superficie); border-bottom: 1px solid rgba(255,255,255,.06); font-family: var(--font-body); font-size: 14px; }
+  .wbar .ok { width: 22px; height: 22px; border-radius: 50%; background: var(--ok); color: #fff; display: inline-flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 700; flex-shrink: 0; }
+  .wbar .wtxt { flex: 1; min-width: 220px; }
+  .wbar .wnote { display: block; color: var(--texto-claro-sec); font-size: 12.5px; }
+  .wbar .wnote b { color: var(--orange); font-weight: 600; }
+  .wbar .wback { font-size: 13px; color: var(--texto-claro-sec); background: transparent; border: 1px solid rgba(255,255,255,.15); border-radius: var(--radius-pill); padding: .4rem .9rem; cursor: pointer; }
+  .wbar .wback:hover { color: var(--texto-claro); border-color: rgba(255,255,255,.35); }
+  #result-frame { display: block; width: 100%; border: 0; height: 80vh; background: #F2F3F7; }
+
+  /* ═══════════ MÓVIL ═══════════ */
+  @media (max-width: 640px) {
+    .topbar { padding: .55rem 1rem; padding-top: max(.55rem, env(safe-area-inset-top)); }
+    .topbar img { height: 28px; }
+    .topbar-tag { font-size: 11px; }
+    #form-view { padding: 1.2rem 1rem calc(var(--navh) + 1.5rem); }
+    h1 { font-size: 27px; margin: .45rem 0 .5rem; }
+    .lead { font-size: 14.5px; margin-bottom: 1.2rem; }
+    body.started .hero { display: none; }       /* una vez empezado, todo el espacio para la pregunta */
+    .qcard { padding: 1.15rem 1rem 1rem; border-radius: 16px; box-shadow: none; }
+    .progress { margin-bottom: 1.1rem; }
+    .qlabel { font-size: 22px; }
+    .qhint { font-size: 13.5px; margin-bottom: .9rem; }
+    .inp { font-size: 17px; padding: .9rem 1rem; }   /* ≥16px: iOS no hace zoom */
+    .phone-row { grid-template-columns: 1fr; }
+    .choices { grid-template-columns: 1fr; gap: .5rem; }
+    .choice { font-size: 16px; min-height: 54px; }
+    .products { grid-template-columns: 1fr; gap: .6rem; }
+    .product { display: grid; grid-template-columns: 42px 1fr; align-items: center; gap: .3rem .85rem; padding: .95rem .9rem; }
+    .product .p-cta { grid-column: 2; justify-self: start; margin-top: .35rem; padding: .45rem .95rem; font-size: 13px; }
+    .product .p-ico { flex-shrink: 0; }
+    .product .p-name { font-size: 17px; }
+    .product .p-desc { font-size: 12.5px; }
+    .enter-hint { display: none; }
+    /* barra de navegación fija abajo, siempre a mano del pulgar */
+    .nav { position: fixed; left: 0; right: 0; bottom: 0; z-index: 50; margin: 0; padding: .7rem 1rem calc(.7rem + env(safe-area-inset-bottom)); background: rgba(14,17,22,.96); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); border-top: 1px solid rgba(255,255,255,.08); }
+    .nav .btn-primary { flex: 1; font-size: 16px; }
+    .nav .btn-ghost { padding: .8rem .6rem; }
+    .dest-box { gap: .75rem; padding: .9rem; }
+    .dest-name { font-size: 20px; }
+    .country-change { margin-left: 0; width: 100%; flex-direction: column; align-items: stretch; gap: .3rem; }
+    .country-change select { width: 100%; border-radius: var(--radius-md); }
+    .summary { grid-template-columns: 1fr; }
+    .consent { font-size: 14.5px; padding: .95rem .9rem; }
+    body.result .topbar { display: none; }     /* en la vista de precios, máximo espacio */
+    .wbar { padding: .55rem .9rem; padding-top: max(.55rem, env(safe-area-inset-top)); font-size: 13px; }
+    .wbar .wtxt { min-width: 0; }
+    .wbar .wnote { font-size: 11.5px; }
+    .wbar .wback { padding: .35rem .7rem; font-size: 12px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <img src="https://trainingym.com/hs-fs/hubfs/Logo-Blanco-Trainingym.png" alt="Trainingym">
+  <span class="topbar-tag">Precios</span>
+</div>
+
+<!-- ═══════════════ FORMULARIO PASO A PASO ═══════════════ -->
+<main id="form-view">
+  <div class="hero">
+    <h1>Descubre los <em>precios</em> al momento</h1>
+    <p class="lead">Elige qué te interesa, responde unas preguntas rápidas y te mostramos los precios al instante.</p>
+  </div>
+
+  <div class="qcard">
+    <div class="progress"><div class="pbar"><span id="pbar"></span></div><div class="pnum" id="pnum"></div></div>
+    <form id="qform" novalidate onsubmit="return false">
+
+      <div class="step" data-field="producto">
+        <div class="start-chip"><span class="start-dot"></span>Empieza aquí</div>
+        <p class="qlabel">Selecciona un producto <span class="req">*</span></p>
+        <p class="qhint">Elige qué precios quieres descubrir: <b>toca una de las tres opciones</b> para continuar.</p>
+        <div class="products" id="c-producto"></div>
+        <div class="errmsg"></div>
+      </div>
+
+      <div class="step" data-field="firstname">
+        <p class="qlabel">¿Cómo te llamas? <span class="req">*</span></p>
+        <p class="qhint">Tu nombre</p>
+        <input class="inp" id="f-firstname" type="text" autocomplete="given-name" enterkeyhint="next" placeholder="Escribe tu nombre">
+        <div class="errmsg"></div>
+      </div>
+
+      <div class="step" data-field="email">
+        <p class="qlabel">¿Cuál es tu email? <span class="req">*</span></p>
+        <p class="qhint">Te enviaremos ahí la información.</p>
+        <input class="inp" id="f-email" type="email" autocomplete="email" inputmode="email" enterkeyhint="next" autocapitalize="off" spellcheck="false" placeholder="nombre@empresa.com">
+        <div class="errmsg"></div>
+      </div>
+
+      <div class="step" data-field="phone">
+        <p class="qlabel">Teléfono WhatsApp <span class="req">*</span></p>
+        <p class="qhint" id="phone-hint">Elige el prefijo de tu país y escribe tu número.</p>
+        <div class="phone-row">
+          <select class="inp" id="f-prefix" onchange="onPrefixChange()" aria-label="Prefijo del país"></select>
+          <input class="inp" id="f-phone" type="tel" autocomplete="tel-national" inputmode="tel" enterkeyhint="next" placeholder="Número de teléfono">
+        </div>
+        <div id="otro-pref-wrap"><input class="inp" id="f-otro-pref" type="text" inputmode="tel" placeholder="Prefijo de tu país, p. ej. +593"></div>
+        <div class="errmsg"></div>
+      </div>
+
+      <div class="step" data-field="modelo">
+        <p class="qlabel">¿Cuál es tu modelo de negocio fitness? <span class="req">*</span></p>
+        <p class="qhint">Elige una opción.</p>
+        <div class="choices" id="c-modelo"></div>
+        <div class="notice" id="modelo-notice"></div>
+        <div class="errmsg"></div>
+      </div>
+
+      <div class="step" data-field="negocio">
+        <p class="qlabel">Nombre del negocio fitness <span class="req">*</span></p>
+        <p class="qhint">Así personalizamos tu propuesta.</p>
+        <input class="inp" id="f-negocio" type="text" autocomplete="organization" enterkeyhint="next" placeholder="Nombre de tu gimnasio, estudio o box">
+        <div class="errmsg"></div>
+      </div>
+
+      <div class="step" data-field="mejorar">
+        <p class="qlabel">¿Qué necesitas mejorar? <span class="req">*</span></p>
+        <p class="qhint">Cuéntanos en pocas palabras qué te gustaría resolver.</p>
+        <textarea class="inp" id="f-mejorar" placeholder="Ej.: captar más socios, automatizar cobros, controlar el acceso…"></textarea>
+        <div class="errmsg"></div>
+      </div>
+
+      <div class="step" data-field="cliente">
+        <p class="qlabel">¿Eres client@ de Trainingym? <span class="req">*</span></p>
+        <p class="qhint">Elige una opción.</p>
+        <div class="choices" id="c-cliente"></div>
+        <div class="errmsg"></div>
+      </div>
+
+      <div class="step" data-field="confirm">
+        <p class="qlabel" id="cf-title">¡Listo!</p>
+        <p class="qhint" id="cf-hint"></p>
+        <div class="dest-box">
+          <img id="cf-flag" src="" alt="">
+          <div><div class="dest-name" id="cf-name"></div><div class="dest-sub" id="cf-sub"></div></div>
+          <label class="country-change" id="cf-change">Cambiar país <select class="inp" id="cf-select" onchange="setChosenCountry(this.value)"></select></label>
+        </div>
+        <div class="notice" id="confirm-notice"></div>
+        <div class="summary" id="cf-summary"></div>
+        <label class="consent" id="consent-box">
+          <input type="checkbox" id="f-consent">
+          <span class="consent-box" aria-hidden="true"></span>
+          <span class="consent-txt">Acepto recibir comunicaciones de Trainingym y puedo consultar la Política de Privacidad <a href="https://trainingym.com/politica-de-privacidad/" target="_blank" rel="noopener">aquí.</a></span>
+        </label>
+        <p class="consent-note">Al hacer clic en «Ver precios» aceptas que Trainingym almacene y procese tus datos personales para mostrarte los precios y atender tu solicitud.</p>
+        <div class="submit-err" id="submit-err"></div>
+      </div>
+
+      <div class="nav">
+        <button type="button" class="btn btn-ghost" id="btn-back" onclick="go(-1)">← Atrás</button>
+        <span class="enter-hint" id="enter-hint">pulsa <kbd>Enter ↵</kbd></span>
+        <button type="button" class="btn btn-primary" id="btn-next" onclick="next()">Continuar →</button>
+      </div>
+    </form>
+  </div>
+</main>
+
+<!-- ═══════════════ PRECIOS ═══════════════ -->
+<section id="result-view">
+  <div class="wbar" id="wbar">
+    <span class="ok">✓</span>
+    <span class="wtxt"><span id="w-hello"></span><span class="wnote" id="w-note"></span></span>
+    <button type="button" class="wback" onclick="backToForm()">← Volver</button>
+  </div>
+  <iframe id="result-frame" title="Precios" src="about:blank"></iframe>
+</section>
+
+<script>
+/* ═══ Configuración ═══ */
+const HS_PORTAL = '8094883';
+const HS_FORM = '8f756a29-9af6-412b-aba2-d9c0e3b2844e';
+const PRODUCTS = {
+  tg: { name: 'Software Trainingym', short: 'Trainingym', url: 'https://mirkotrain.github.io/Wizard-NEWprice-UNICO/',
+        desc: 'Software de gestión para gimnasios, estudios y boxes: tarifas, puesta en marcha y control de accesos.',
+        ico: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><rect x="2" y="9" width="3" height="6" rx="1"/><rect x="19" y="9" width="3" height="6" rx="1"/><rect x="5" y="7" width="3" height="10" rx="1"/><rect x="16" y="7" width="3" height="10" rx="1"/><line x1="8" y1="12" x2="16" y2="12"/></svg>' },
+  lf: { name: 'Líderes del Fitness', short: 'Líderes del Fitness', url: 'https://mirkotrain.github.io/Presentaci-n-Lideres-del-Fitness/',
+        desc: 'Programa de formación para dueños y gerentes de negocios fitness.',
+        ico: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 9l10-5 10 5-10 5z"/><path d="M6 11v5c0 1.5 3 3 6 3s6-1.5 6-3v-5"/></svg>' },
+  nm: { name: 'NewMe CRM', short: 'NewMe', url: 'https://mirkotrain.github.io/presentaci-n-Newme-GHL-/',
+        desc: 'CRM con IA para captar, vender y comunicar con tus clientes.',
+        ico: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a8 8 0 0 1-11.6 7.1L4 20l1-4.6A8 8 0 1 1 21 12z"/><path d="M8.5 11h7M8.5 14h4"/></svg>' }
+};
+const PRODUCT_ORDER = ['tg', 'lf', 'nm'];
+
+/* Países con wizard propio (el resto → Resto de LATAM en USD) */
+const COUNTRIES = {
+  es:  { name: 'España',         flag: 'es', cur: 'Euros (EUR)' },
+  usd: { name: 'Resto de LATAM', flag: 'us', cur: 'Dólares estadounidenses (USD)' },
+  mx:  { name: 'México',         flag: 'mx', cur: 'Pesos mexicanos (MXN)' },
+  cl:  { name: 'Chile',          flag: 'cl', cur: 'Pesos chilenos (CLP)' },
+  ar:  { name: 'Argentina',      flag: 'ar', cur: 'Pesos argentinos (ARS)' },
+  co:  { name: 'Colombia',       flag: 'co', cur: 'Pesos colombianos (COP)' },
+  pe:  { name: 'Perú',           flag: 'pe', cur: 'Soles (PEN)' },
+  bo:  { name: 'Bolivia',        flag: 'bo', cur: 'Bolivianos (BOB)' },
+  gt:  { name: 'Guatemala',      flag: 'gt', cur: 'Quetzales (GTQ)' },
+  uy:  { name: 'Uruguay',        flag: 'uy', cur: 'Pesos uruguayos (UYU)' }
+};
+const COUNTRY_ORDER = ['es', 'usd', 'mx', 'cl', 'ar', 'co', 'pe', 'bo', 'gt', 'uy'];
+const PREFIX_COUNTRY = { '34': 'es', '52': 'mx', '56': 'cl', '54': 'ar', '57': 'co', '51': 'pe', '591': 'bo', '502': 'gt', '598': 'uy' };
+const PREFIXES = [
+  ['es', 'España', '34'], ['mx', 'México', '52'], ['cl', 'Chile', '56'], ['ar', 'Argentina', '54'], ['co', 'Colombia', '57'],
+  ['pe', 'Perú', '51'], ['bo', 'Bolivia', '591'], ['gt', 'Guatemala', '502'], ['uy', 'Uruguay', '598'],
+  ['us', 'Estados Unidos / Canadá', '1'], ['ec', 'Ecuador', '593'], ['py', 'Paraguay', '595'], ['ve', 'Venezuela', '58'],
+  ['cr', 'Costa Rica', '506'], ['pa', 'Panamá', '507'], ['do', 'República Dominicana', '1'], ['sv', 'El Salvador', '503'],
+  ['hn', 'Honduras', '504'], ['ni', 'Nicaragua', '505'], ['pr', 'Puerto Rico', '1'], ['br', 'Brasil', '55'],
+  ['pt', 'Portugal', '351'], ['it', 'Italia', '39'], ['fr', 'Francia', '33'], ['de', 'Alemania', '49'], ['gb', 'Reino Unido', '44'],
+  ['ad', 'Andorra', '376']
+];
+
+/* Opciones del formulario de HubSpot: [texto visible, valor interno, tipo] */
+const MODELOS = [
+  ['Gimnasio', 'Gimnasio', 'fit'], ['Estudio fitness', 'Estudio de fitness', 'fit'], ['Estudio de Pilates', 'Estudio de Pilates', 'fit'],
+  ['Estudio de yoga', 'Estudio de yoga', 'fit'], ['Crossfit / Hyrox', 'Crossfit / Hyrox', 'fit'], ['Boxeo/ Artes marciales', 'Box', 'fit'],
+  ['Centro de entrenamiento personal', 'Entrenador personal', 'fit'],
+  ['Nutricionista', 'nutricionista', 'no'], ['Fisioterapeuta', 'Fisioterapeuta', 'no'],
+  ['Soy cliente de un gimnasio', 'Soy cliente de un gimnasio', 'no'], ['No soy un negocio fitness', 'Otro', 'no']
+];
+const CLIENTE = [['No soy client@', 'No soy client@'], ['Soy client@', 'Sí']];
+function notFitMsg(btn) {
+  return 'Nuestra herramienta de precios está pensada para <b>negocios fitness</b> (gimnasios, estudios, boxes y centros de entrenamiento) y <b>no se adapta al modelo que has seleccionado</b>, así que los precios que verás podrían no corresponder a tu caso. Si aun así quieres verlos, haz clic en <b>' + btn + '</b>.';
+}
+
+const data = { producto: null, modelo: null, modeloLabel: null, modeloTipo: null, cliente: null, clienteLabel: null };
+let chosenCountry = null, idx = 0;
+const steps = Array.from(document.querySelectorAll('.step'));
+const LAST = steps.length - 1;          // paso de confirmación
+const NQ = steps.length - 1;            // nº de preguntas
+function warnNotFit() { return data.modeloTipo === 'no' && data.producto !== 'lf'; }   // en Líderes del Fitness no se avisa
+
+/* ─── Producto ─── */
+(function buildProducts() {
+  const box = document.getElementById('c-producto');
+  box.innerHTML = PRODUCT_ORDER.map(k => { const P = PRODUCTS[k]; return `<button type="button" class="product" data-k="${k}"><span class="p-ico">${P.ico}</span><span><span class="p-name">${P.name}</span><br><span class="p-desc">${P.desc}</span></span><span class="p-cta">Seleccionar →</span></button>`; }).join('');
+  box.querySelectorAll('.product').forEach(b => b.addEventListener('click', () => {
+    box.querySelectorAll('.product').forEach(x => x.classList.toggle('on', x === b));
+    box.classList.add('chosen');
+    data.producto = b.dataset.k; clearErr();
+    setTimeout(next, 240);
+  }));
+})();
+
+/* ─── Opciones ─── */
+function buildChoices(boxId, list, key) {
+  const box = document.getElementById(boxId);
+  box.innerHTML = list.map((o, i) => `<button type="button" class="choice" data-i="${i}"><span class="key">${String.fromCharCode(65 + i)}</span>${o[0]}</button>`).join('');
+  box.querySelectorAll('.choice').forEach(b => b.addEventListener('click', () => pickChoice(boxId, list, key, +b.dataset.i)));
+}
+function pickChoice(boxId, list, key, i) {
+  document.getElementById(boxId).querySelectorAll('.choice').forEach(b => b.classList.toggle('on', +b.dataset.i === i));
+  const o = list[i];
+  data[key] = o[1]; data[key + 'Label'] = o[0];
+  clearErr();
+  if (key === 'modelo') {
+    data.modeloTipo = o[2];
+    const n = document.getElementById('modelo-notice');
+    n.innerHTML = 'ℹ️ ' + notFitMsg('Continuar');
+    n.classList.toggle('on', warnNotFit());
+    if (warnNotFit()) { setTimeout(() => n.scrollIntoView({ behavior: 'smooth', block: 'center' }), 60); return; }   // se queda para que lea el aviso
+  }
+  setTimeout(next, 240);
+}
+buildChoices('c-modelo', MODELOS, 'modelo');
+buildChoices('c-cliente', CLIENTE, 'cliente');
+
+/* ─── Prefijos ─── */
+(function buildPrefixes() {
+  const sel = document.getElementById('f-prefix');
+  sel.innerHTML = PREFIXES.map((p, i) => `<option value="${i}">${p[1]} (+${p[2]})</option>`).join('') + '<option value="otro">Otro país…</option>';
+  sel.value = String(guessPrefixIndex());
+})();
+function guessPrefixIndex() {
+  let tz = ''; try { tz = Intl.DateTimeFormat().resolvedOptions().timeZone || ''; } catch (e) {}
+  const map = { 'Europe/Madrid': 'es', 'Atlantic/Canary': 'es', 'Africa/Ceuta': 'es', 'America/Mexico_City': 'mx', 'America/Monterrey': 'mx', 'America/Cancun': 'mx', 'America/Tijuana': 'mx', 'America/Merida': 'mx', 'America/Chihuahua': 'mx', 'America/Hermosillo': 'mx', 'America/Mazatlan': 'mx', 'America/Santiago': 'cl', 'America/Bogota': 'co', 'America/Lima': 'pe', 'America/La_Paz': 'bo', 'America/Guatemala': 'gt', 'America/Montevideo': 'uy', 'America/Guayaquil': 'ec', 'America/Asuncion': 'py', 'America/Caracas': 've', 'America/Costa_Rica': 'cr', 'America/Panama': 'pa', 'America/Santo_Domingo': 'do', 'America/El_Salvador': 'sv', 'America/Tegucigalpa': 'hn', 'America/Managua': 'ni', 'Europe/Lisbon': 'pt' };
+  const cc = map[tz] || (tz.startsWith('America/Argentina') ? 'ar' : null);
+  const i = cc ? PREFIXES.findIndex(p => p[0] === cc) : 0;
+  return i >= 0 ? i : 0;
+}
+function onPrefixChange() {
+  const otro = document.getElementById('f-prefix').value === 'otro';
+  document.getElementById('otro-pref-wrap').style.display = otro ? 'block' : 'none';
+  if (otro) document.getElementById('f-otro-pref').focus();
+}
+function currentPrefix() {
+  const v = document.getElementById('f-prefix').value;
+  if (v === 'otro') return (document.getElementById('f-otro-pref').value || '').replace(/[^\d]/g, '');
+  return PREFIXES[+v][2];
+}
+function countryFromPrefix(pref) { return PREFIX_COUNTRY[pref] || 'usd'; }
+
+/* ─── Destino (país / producto) ─── */
+document.getElementById('cf-select').innerHTML = COUNTRY_ORDER.map(k => `<option value="${k}">${COUNTRIES[k].name}</option>`).join('');
+function setChosenCountry(code) {
+  chosenCountry = COUNTRIES[code] ? code : 'usd';
+  renderConfirm();
+}
+function ctaText() {
+  if (data.producto === 'tg') return 'Ver precios para ' + COUNTRIES[chosenCountry].name + ' →';
+  return 'Ver precios de ' + PRODUCTS[data.producto].short + ' →';
+}
+function renderConfirm() {
+  const isTg = data.producto === 'tg', P = PRODUCTS[data.producto];
+  const flag = document.getElementById('cf-flag');
+  document.getElementById('cf-change').style.display = isTg ? '' : 'none';
+  if (isTg) {
+    const C = COUNTRIES[chosenCountry];
+    document.getElementById('cf-title').textContent = '¡Listo! Revisa tu país';
+    document.getElementById('cf-hint').innerHTML = 'Al hacer clic en <b>Ver precios</b> se te mostrarán los precios para el país detectado por tu prefijo de WhatsApp: <b>' + C.name + '</b>. Si no es correcto, puedes cambiarlo.';
+    flag.style.display = ''; flag.src = 'https://flagcdn.com/w80/' + C.flag + '.png'; flag.alt = C.name;
+    document.getElementById('cf-name').textContent = C.name;
+    document.getElementById('cf-sub').textContent = 'Precios en ' + C.cur + (chosenCountry === 'es' ? '' : ' · cobro en euros');
+    document.getElementById('cf-select').value = chosenCountry;
+  } else {
+    document.getElementById('cf-title').textContent = '¡Listo!';
+    document.getElementById('cf-hint').innerHTML = 'Al hacer clic en <b>Ver precios</b> se te mostrarán los precios de <b>' + P.name + '</b>.';
+    flag.style.display = 'none';
+    document.getElementById('cf-name').textContent = P.name;
+    document.getElementById('cf-sub').textContent = P.desc;
+  }
+  const n = document.getElementById('confirm-notice');
+  n.innerHTML = 'ℹ️ ' + notFitMsg('Ver precios');
+  n.classList.toggle('on', warnNotFit());
+  document.getElementById('cf-summary').innerHTML =
+    `<span>Nombre: <b>${esc(val('f-firstname'))}</b></span><span>Email: <b>${esc(val('f-email'))}</b></span>` +
+    `<span>WhatsApp: <b>+${esc(currentPrefix())} ${esc(val('f-phone'))}</b></span><span>Negocio: <b>${esc(val('f-negocio'))}</b></span>` +
+    `<span>Modelo: <b>${esc(data.modeloLabel || '')}</b></span><span>Cliente: <b>${esc(data.clienteLabel || '')}</b></span>`;
+  if (idx === LAST) document.getElementById('btn-next').innerHTML = ctaText();
+}
+
+/* ─── Navegación ─── */
+function show(i) {
+  idx = Math.max(0, Math.min(LAST, i));
+  steps.forEach((s, k) => s.classList.toggle('on', k === idx));
+  document.body.classList.toggle('started', idx > 0);
+  const isConfirm = idx === LAST;
+  document.getElementById('pbar').style.width = (isConfirm ? 100 : (idx / NQ) * 100) + '%';
+  document.getElementById('pnum').textContent = isConfirm ? 'Último paso' : 'Pregunta ' + (idx + 1) + ' de ' + NQ;
+  document.getElementById('btn-back').style.visibility = idx === 0 ? 'hidden' : 'visible';
+  document.getElementById('enter-hint').style.display = isConfirm || idx === 0 ? 'none' : '';
+  document.getElementById('submit-err').style.display = 'none';
+  if (isConfirm) {
+    if (!chosenCountry) chosenCountry = countryFromPrefix(currentPrefix());
+    renderConfirm();
+  } else document.getElementById('btn-next').innerHTML = 'Continuar →';
+  // en la pregunta de modelo, el aviso se recalcula según el producto
+  const n = document.getElementById('modelo-notice'); n.classList.toggle('on', warnNotFit());
+  document.getElementById('btn-next').style.display = idx === 0 ? 'none' : '';
+  document.querySelector('.nav').style.display = idx === 0 ? 'none' : '';   // en la elección de producto no hace falta la barra
+  syncNavH();
+  const f = steps[idx].querySelector('input:not([type=hidden]), textarea');
+  if (f && window.matchMedia('(hover: hover)').matches) setTimeout(() => f.focus({ preventScroll: true }), 60);
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+  clearErr();
+}
+function go(d) { show(idx + d); }
+function val(id) { return (document.getElementById(id).value || '').trim(); }
+function esc(s) { return String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c])); }
+function setErr(msg) { const e = steps[idx].querySelector('.errmsg'); if (e) e.textContent = msg; steps[idx].querySelectorAll('.inp').forEach(i => i.classList.add('err')); }
+function clearErr() { steps.forEach(s => { const e = s.querySelector('.errmsg'); if (e) e.textContent = ''; s.querySelectorAll('.inp').forEach(i => i.classList.remove('err')); }); }
+function validate() {
+  const f = steps[idx].dataset.field;
+  if (f === 'producto' && !data.producto) return 'Elige una opción.';
+  if (f === 'firstname' && !val('f-firstname')) return 'Escribe tu nombre.';
+  if (f === 'email' && !/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(val('f-email'))) return 'Escribe un email válido.';
+  if (f === 'phone') {
+    if (document.getElementById('f-prefix').value === 'otro' && !currentPrefix()) return 'Escribe el prefijo de tu país.';
+    if (val('f-phone').replace(/[^\d]/g, '').length < 6) return 'Escribe un número de WhatsApp válido.';
+  }
+  if (f === 'modelo' && !data.modelo) return 'Elige una opción.';
+  if (f === 'negocio' && !val('f-negocio')) return 'Escribe el nombre de tu negocio.';
+  if (f === 'mejorar' && !val('f-mejorar')) return 'Cuéntanos qué necesitas mejorar.';
+  if (f === 'cliente' && !data.cliente) return 'Elige una opción.';
+  return '';
+}
+function next() {
+  if (idx === LAST) return submitForm();
+  const err = validate();
+  if (err) { setErr(err); return; }
+  if (steps[idx].dataset.field === 'phone') chosenCountry = countryFromPrefix(currentPrefix());   // país según el prefijo
+  show(idx + 1);
+}
+document.addEventListener('keydown', e => {
+  if (e.key !== 'Enter' || document.getElementById('form-view').style.display === 'none') return;
+  if (e.target.tagName === 'TEXTAREA' && !e.metaKey && !e.ctrlKey) return;
+  if (e.target.tagName === 'SELECT' || e.target.tagName === 'BUTTON') return;
+  e.preventDefault(); next();
+});
+document.addEventListener('keydown', e => {   // atajos A, B, C… en preguntas de opciones (escritorio)
+  const f = steps[idx] && steps[idx].dataset.field;
+  if ((f !== 'modelo' && f !== 'cliente') || /INPUT|TEXTAREA|SELECT/.test(e.target.tagName) || e.metaKey || e.ctrlKey) return;
+  const i = e.key.toUpperCase().charCodeAt(0) - 65, list = f === 'modelo' ? MODELOS : CLIENTE;
+  if (e.key.length === 1 && i >= 0 && i < list.length) pickChoice(f === 'modelo' ? 'c-modelo' : 'c-cliente', list, f, i);
+});
+
+/* ─── Barra fija móvil: reserva su altura ─── */
+function syncNavH() {
+  const nav = document.querySelector('.nav');
+  const fixed = getComputedStyle(nav).position === 'fixed' && nav.style.display !== 'none';
+  document.documentElement.style.setProperty('--navh', fixed ? nav.offsetHeight + 'px' : '0px');
+}
+window.addEventListener('resize', () => { syncNavH(); sizeFrame(); });
+
+/* ─── Envío a HubSpot ─── */
+function getCookie(n) { const m = document.cookie.match('(?:^|; )' + n + '=([^;]*)'); return m ? decodeURIComponent(m[1]) : null; }
+async function submitForm() {
+  const btn = document.getElementById('btn-next'), errBox = document.getElementById('submit-err');
+  const fields = [
+    ['firstname', val('f-firstname')], ['email', val('f-email')], ['phone', '+' + currentPrefix() + ' ' + val('f-phone')],
+    ['cual_es_tu_modelo_de_negocio_fitness_', data.modelo], ['nombre_de_gimnasio', val('f-negocio')],
+    ['comentario_de_formulario', val('f-mejorar')], ['eres_client_de_trainingym_', data.cliente]
+  ].map(([name, value]) => ({ objectTypeId: '0-1', name, value }));
+  const consentTxt = 'Acepto recibir comunicaciones de Trainingym y puedo consultar la Política de Privacidad aquí.';
+  const legalConsentOptions = { consent: {
+    consentToProcess: true,
+    text: 'Acepto permitir a Trainingym almacenar y procesar mis datos personales.',
+    communications: [{ value: document.getElementById('f-consent').checked, subscriptionTypeId: 9875280, text: consentTxt }]
+  } };
+  const context = { pageUri: location.href, pageName: 'Precios · ' + PRODUCTS[data.producto].name + (data.producto === 'tg' ? ' · ' + COUNTRIES[chosenCountry].name : '') };
+  const hutk = getCookie('hubspotutk'); if (hutk) context.hutk = hutk;
+  btn.disabled = true; btn.innerHTML = 'Enviando…'; errBox.style.display = 'none';
+  try {
+    const r = await fetch(`https://api.hsforms.com/submissions/v3/integration/submit/${HS_PORTAL}/${HS_FORM}`, {
+      method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ fields, context, legalConsentOptions })
+    });
+    if (!r.ok) throw new Error('HTTP ' + r.status + ' ' + (await r.text()).slice(0, 200));
+    btn.disabled = false;
+    openResult();
+  } catch (e) {
+    console.warn('Error enviando a HubSpot', e);
+    btn.disabled = false; btn.innerHTML = ctaText();
+    errBox.innerHTML = 'No hemos podido enviar tus datos. <a href="#" style="color:var(--orange)" onclick="submitForm(); return false">Reintentar</a> · <a href="#" style="color:var(--texto-claro-sec)" onclick="openResult(); return false">Ver los precios igualmente</a>';
+    errBox.style.display = 'block';
+  }
+}
+
+/* ─── Mostrar los precios ─── */
+function sizeFrame() {
+  const v = document.getElementById('result-view');
+  if (v.style.display !== 'block') return;
+  const top = v.getBoundingClientRect().top + window.scrollY;
+  const h = (window.visualViewport ? window.visualViewport.height : window.innerHeight);
+  document.getElementById('result-frame').style.height = Math.max(420, h - document.getElementById('wbar').offsetHeight - (top > 0 ? top : 0)) + 'px';
+}
+function openPricingInside(frame) {
+  // Las presentaciones están en el mismo dominio (mirkotrain.github.io): se abre directamente su apartado de precios
+  try {
+    const w = frame.contentWindow, d = w.document;
+    if (data.producto === 'lf' && typeof w.openPricingModal === 'function') { w.openPricingModal(); return true; }
+    if (data.producto === 'nm') { const b = d.getElementById('pricingBtn'); if (b) { b.click(); return true; } }
+  } catch (e) { /* dominio distinto: el usuario puede pulsar el botón de precios */ }
+  return false;
+}
+function openResult() {
+  const P = PRODUCTS[data.producto], frame = document.getElementById('result-frame');
+  const name = esc(val('f-firstname'));
+  let note = '';
+  if (data.producto === 'tg') {
+    const C = COUNTRIES[chosenCountry];
+    const p = new URLSearchParams({ pais: chosenCountry, firstname: val('f-firstname'), company: val('f-negocio') });
+    if (data.modeloTipo === 'fit') p.set('cual_es_tu_modelo_de_negocio_fitness_', data.modeloLabel);
+    frame.onload = null;
+    frame.src = P.url + '?' + p.toString();
+    document.getElementById('w-hello').innerHTML = `Gracias, <b>${name}</b>. Precios de Trainingym para <b>${esc(C.name)}</b>.`;
+    note = warnNotFit() ? 'Recuerda: la herramienta <b>no se adapta</b> a tu modelo de negocio; los precios son orientativos.' : 'Puedes cambiar de país arriba a la derecha del wizard.';
+  } else {
+    frame.onload = () => { let tries = 0; const t = setInterval(() => { if (openPricingInside(frame) || ++tries > 12) { clearInterval(t); if (tries > 12) document.getElementById('w-note').innerHTML = 'Pulsa <b>' + (data.producto === 'lf' ? 'Ver precios' : 'Tarifas') + '</b> arriba a la derecha de la presentación.'; } }, 250); };
+    frame.src = P.url;
+    document.getElementById('w-hello').innerHTML = `Gracias, <b>${name}</b>. Precios de <b>${esc(P.name)}</b>.`;
+    note = warnNotFit() ? 'Recuerda: la herramienta <b>no se adapta</b> a tu modelo de negocio; los precios son orientativos.' : '';
+  }
+  document.getElementById('w-note').innerHTML = note;
+  document.getElementById('form-view').style.display = 'none';
+  document.getElementById('result-view').style.display = 'block';
+  document.body.classList.add('result');
+  window.scrollTo(0, 0);
+  requestAnimationFrame(sizeFrame);
+}
+function backToForm() {
+  document.getElementById('result-view').style.display = 'none';
+  document.getElementById('form-view').style.display = '';
+  document.body.classList.remove('result');
+  document.getElementById('result-frame').src = 'about:blank';
+  show(LAST);
+}
+if (window.visualViewport) window.visualViewport.addEventListener('resize', sizeFrame);
+
+show(0);
+syncNavH();
+</script>
+</body>
+</html>
